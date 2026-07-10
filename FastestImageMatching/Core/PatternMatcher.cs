@@ -58,6 +58,9 @@ namespace FastestImageMatching.Core
             if (sourceImage == null || sourceImage.Empty())
                 throw new ArgumentException("Source image cannot be null or empty");
 
+            if (templateImage == null)
+                throw new InvalidOperationException("Template image is null");
+
             config ??= new MatchConfig();
 
             var results = new List<MatchResult>();
@@ -106,6 +109,9 @@ namespace FastestImageMatching.Core
             if (!templateData.IsLearned)
                 throw new InvalidOperationException("Template must be learned first");
 
+            if (templateImage == null)
+                throw new InvalidOperationException("Template image is null");
+
             config ??= new MatchConfig();
             var allResults = new List<MatchResult>();
 
@@ -141,6 +147,9 @@ namespace FastestImageMatching.Core
 
         private Mat RotateImage(Mat image, double angle)
         {
+            if (image == null || image.Empty())
+                throw new ArgumentException("Image cannot be null or empty");
+
             Point2f center = new Point2f(image.Cols / 2.0f, image.Rows / 2.0f);
             Mat rotationMatrix = Cv2.GetRotationMatrix2D(center, angle, 1.0);
             Mat rotated = new Mat();
@@ -151,6 +160,9 @@ namespace FastestImageMatching.Core
 
         private List<MatchResult> FilterAndDedupResults(List<MatchResult> results, MatchConfig config)
         {
+            if (templateImage == null)
+                return new List<MatchResult>();
+
             // Sort by score
             var sorted = results.OrderByDescending(r => r.Score).ToList();
             var filtered = new List<MatchResult>();

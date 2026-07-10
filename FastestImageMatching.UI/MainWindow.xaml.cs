@@ -146,8 +146,8 @@ namespace FastestImageMatching.UI
                 {
                     sourceImageMat = image.Clone();
                     Mat display = new Mat();
-                    Cv2.Resize(sourceImageMat, display, new Size(400, 350));
-                    SourceImage.Source = display.ToBitmapSource();
+                    Cv2.Resize(sourceImageMat, display, new OpenCvSharp.Size(400, 350));
+                    SourceImage.Source = BitmapConverter.ToBitmap(display);
                     display?.Dispose();
                     StatusText.Text = "Source image loaded";
                 }
@@ -155,8 +155,8 @@ namespace FastestImageMatching.UI
                 {
                     templateImageMat = image.Clone();
                     Mat display = new Mat();
-                    Cv2.Resize(templateImageMat, display, new Size(400, 350));
-                    TemplateImage.Source = display.ToBitmapSource();
+                    Cv2.Resize(templateImageMat, display, new OpenCvSharp.Size(400, 350));
+                    TemplateImage.Source = BitmapConverter.ToBitmap(display);
                     display?.Dispose();
                     StatusText.Text = "Template image loaded";
                 }
