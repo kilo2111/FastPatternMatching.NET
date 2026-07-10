@@ -23,10 +23,30 @@ namespace FastestImageMatching.Core
             if (image == null || image.Empty())
                 throw new ArgumentException("Input image cannot be null or empty");
 
-            // Start with original image
-            pyramid.Add(image.Clone());
+            // Convert to grayscale if needed for consistency
+            Mat grayImage = new Mat();
+            if (image.Channels() == 3)
+            {
+                Cv2.CvtColor(image, grayImage, ColorConversionCodes.BGR2GRAY);
+            }
+            else if (image.Channels() == 1)
+            {
+                grayImage = image.Clone();
+            }
+            else
+            {
+                throw new ArgumentException("Image must be grayscale or BGR color");
+            }
 
-            Mat current = image.Clone();
+            // Convert to float for better precision
+            Mat floatImage = new Mat();
+            grayImage.ConvertTo(floatImage, MatType.CV_32F);
+            grayImage.Dispose();
+
+            // Start with original image
+            pyramid.Add(floatImage.Clone());
+
+            Mat current = floatImage.Clone();
             int level = 0;
 
             // Build coarser levels until minimum area reached
@@ -43,14 +63,29 @@ namespace FastestImageMatching.Core
                     break; // No more scaling needed
 
                 Mat downsampled = new Mat();
-                Cv2.Resize(current, downsampled, new Size(newWidth, newHeight), 0, 0, InterpolationFlags.Area);
+                try
+                {
+                    Cv2.Resize(current, downsampled, new OpenCvSharp.Size(newWidth, newHeight), 0, 0, InterpolationFlags.Area);
+                    pyramid.Add(downsampled.Clone());
+                    downsampled.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    downsampled?.Dispose();
+                    throw new Exception($"Failed to create pyramid level {level}: {ex.Message}", ex);
+                }
 
-                pyramid.Add(downsampled);
-                current = downsampled;
+                current?.Dispose();
+                current = new Mat();
+                if (pyramid.Count > 0)
+                {
+                    current = pyramid[pyramid.Count - 1].Clone();
+                }
                 level++;
             }
 
             current?.Dispose();
+            floatImage?.Dispose();
             return pyramid;
         }
 
@@ -77,7 +112,10 @@ namespace FastestImageMatching.Core
             Console.WriteLine($"Pyramid Levels: {pyramid.Count}");
             for (int i = 0; i < pyramid.Count; i++)
             {
-                Console.WriteLine($"  Level {i}: {pyramid[i].Width}x{pyramid[i].Height}");
+                if (pyramid[i] != null && !pyramid[i].Empty())
+                {
+                    Console.WriteLine($"  Level {i}: {pyramid[i].Width}x{pyramid[i].Height}");
+                }
             }
         }
     }
