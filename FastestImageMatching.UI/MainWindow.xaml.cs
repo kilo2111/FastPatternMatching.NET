@@ -1,5 +1,5 @@
 using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -9,12 +9,18 @@ using FastestImageMatching.Models;
 
 namespace FastestImageMatching.UI
 {
-    public partial class MainWindow : Window
+    /// <summary>
+    /// Main window for the pattern matching application
+    /// </summary>
+    public partial class MainWindow : System.Windows.Window
     {
-        private Mat sourceImageMat;
-        private Mat templateImageMat;
+        private Mat? sourceImageMat;
+        private Mat? templateImageMat;
         private PatternMatcher matcher;
 
+        /// <summary>
+        /// Initialize the main window
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -108,13 +114,16 @@ namespace FastestImageMatching.UI
             }
         }
 
+        /// <summary>
+        /// Handle drag and drop for image loading
+        /// </summary>
         protected override void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                if (files.Length > 0)
+                string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
+                if (files?.Length > 0)
                 {
                     LoadImage(files[0]);
                 }

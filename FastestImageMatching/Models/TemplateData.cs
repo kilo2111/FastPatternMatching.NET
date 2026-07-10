@@ -39,6 +39,9 @@ namespace FastestImageMatching.Models
         /// </summary>
         public int BorderColor { get; set; }
 
+        /// <summary>
+        /// Clear all template data
+        /// </summary>
         public void Clear()
         {
             foreach (var mat in PyramidLevels)
@@ -52,12 +55,18 @@ namespace FastestImageMatching.Models
             IsLearned = false;
         }
 
+        /// <summary>
+        /// Dispose resources
+        /// </summary>
         public void Dispose()
         {
             Clear();
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Finalizer
+        /// </summary>
         ~TemplateData()
         {
             Clear();

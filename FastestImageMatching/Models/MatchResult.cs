@@ -32,10 +32,16 @@ namespace FastestImageMatching.Models
         /// </summary>
         public RotatedRect RotatedRect { get; set; }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public MatchResult()
         {
         }
 
+        /// <summary>
+        /// Constructor with parameters
+        /// </summary>
         public MatchResult(Point2d location, double score, double angle)
         {
             Location = location;
@@ -43,6 +49,9 @@ namespace FastestImageMatching.Models
             Angle = angle;
         }
 
+        /// <summary>
+        /// String representation of the match result
+        /// </summary>
         public override string ToString()
         {
             return $"Match: Pos=({Location.X:F2}, {Location.Y:F2}), Score={Score:F4}, Angle={Angle:F2}°";

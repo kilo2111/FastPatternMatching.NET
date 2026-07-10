@@ -12,7 +12,7 @@ namespace FastestImageMatching.Core
     public class PatternMatcher : IDisposable
     {
         private TemplateData templateData = new();
-        private Mat templateImage;
+        private Mat? templateImage;
 
         /// <summary>
         /// Learn/preprocess the template image
@@ -50,7 +50,7 @@ namespace FastestImageMatching.Core
         /// <summary>
         /// Find pattern matches in source image
         /// </summary>
-        public List<MatchResult> Match(Mat sourceImage, MatchConfig config = null)
+        public List<MatchResult> Match(Mat sourceImage, MatchConfig? config = null)
         {
             if (!templateData.IsLearned)
                 throw new InvalidOperationException("Template must be learned first using LearnTemplate()");
@@ -101,7 +101,7 @@ namespace FastestImageMatching.Core
         /// <summary>
         /// Find pattern with rotation invariance
         /// </summary>
-        public List<MatchResult> MatchWithRotation(Mat sourceImage, MatchConfig config = null)
+        public List<MatchResult> MatchWithRotation(Mat sourceImage, MatchConfig? config = null)
         {
             if (!templateData.IsLearned)
                 throw new InvalidOperationException("Template must be learned first");
@@ -174,6 +174,9 @@ namespace FastestImageMatching.Core
             return filtered;
         }
 
+        /// <summary>
+        /// Dispose resources
+        /// </summary>
         public void Dispose()
         {
             templateData?.Dispose();
