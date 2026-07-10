@@ -1,31 +1,47 @@
 <Window x:Class="FastestImageMatching.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Fastest Image Pattern Matching" Height="800" Width="1200"
+        Title="Fastest Image Pattern Matching" Height="900" Width="1400"
         Background="#F5F5F5" AllowDrop="True">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="350"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Main Image Display Area -->
+        <!-- Main Content Area -->
         <Grid Grid.Column="0" Background="White" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" BorderBrush="#CCCCCC" BorderThickness="1" Margin="5">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Image x:Name="SourceImage" MaxHeight="350" MaxWidth="450" Margin="10"/>
-                    <TextBlock Text="Source Image (Drag &amp; Drop)" Foreground="#666" TextAlignment="Center" Margin="10"/>
-                </StackPanel>
-            </Border>
+            <!-- Source and Result Images -->
+            <Grid Grid.Row="0" Background="#F0F0F0" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
+                <Border Grid.Column="0" BorderBrush="#CCCCCC" BorderThickness="1" Margin="5">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image x:Name="SourceImage" MaxHeight="380" MaxWidth="500" Margin="10"/>
+                        <TextBlock Text="Source Image" Foreground="#666" TextAlignment="Center" Margin="10"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" BorderBrush="#CCCCCC" BorderThickness="1" Margin="5">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image x:Name="ResultImage" MaxHeight="380" MaxWidth="500" Margin="10"/>
+                        <TextBlock Text="Match Results" Foreground="#666" TextAlignment="Center" Margin="10"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Template Image -->
             <Border Grid.Row="1" BorderBrush="#CCCCCC" BorderThickness="1" Margin="5">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Image x:Name="TemplateImage" MaxHeight="350" MaxWidth="450" Margin="10"/>
+                    <Image x:Name="TemplateImage" MaxHeight="300" MaxWidth="400" Margin="10"/>
                     <TextBlock Text="Template Image (Drag &amp; Drop)" Foreground="#666" TextAlignment="Center" Margin="10"/>
                 </StackPanel>
             </Border>
@@ -33,55 +49,58 @@
 
         <!-- Control Panel -->
         <StackPanel Grid.Column="1" Margin="10" Background="White" VerticalAlignment="Top">
-            <TextBlock Text="Pattern Matching" FontSize="16" FontWeight="Bold" Margin="10"/>
+            <TextBlock Text="Pattern Matching" FontSize="14" FontWeight="Bold" Margin="10"/>
             <Separator Background="#EEEEEE" Margin="0,5"/>
 
             <!-- Parameters Section -->
-            <TextBlock Text="Parameters" FontSize="12" FontWeight="Bold" Margin="10,15,10,5"/>
+            <TextBlock Text="Parameters" FontSize="11" FontWeight="Bold" Margin="10,10,10,5"/>
 
             <StackPanel Margin="10">
-                <TextBlock Text="Target Number:" Foreground="#333" FontSize="11"/>
-                <Slider x:Name="TargetNumberSlider" Minimum="1" Maximum="20" Value="5" Margin="0,5"/>
-                <TextBlock x:Name="TargetNumberValue" Text="5" Foreground="#666" FontSize="10"/>
+                <TextBlock Text="Target Number:" Foreground="#333" FontSize="10"/>
+                <Slider x:Name="TargetNumberSlider" Minimum="1" Maximum="20" Value="5" Margin="0,3"/>
+                <TextBlock x:Name="TargetNumberValue" Text="5" Foreground="#666" FontSize="9"/>
             </StackPanel>
 
             <StackPanel Margin="10">
-                <TextBlock Text="Score Threshold:" Foreground="#333" FontSize="11"/>
-                <Slider x:Name="ScoreThresholdSlider" Minimum="0.5" Maximum="0.99" Value="0.8" Margin="0,5"/>
-                <TextBlock x:Name="ScoreThresholdValue" Text="0.8" Foreground="#666" FontSize="10"/>
+                <TextBlock Text="Score Threshold:" Foreground="#333" FontSize="10"/>
+                <Slider x:Name="ScoreThresholdSlider" Minimum="0.5" Maximum="0.99" Value="0.8" Margin="0,3"/>
+                <TextBlock x:Name="ScoreThresholdValue" Text="0.8" Foreground="#666" FontSize="9"/>
             </StackPanel>
 
             <StackPanel Margin="10">
-                <TextBlock Text="Tolerance Angle (degrees):" Foreground="#333" FontSize="11"/>
-                <Slider x:Name="AngleSlider" Minimum="0" Maximum="360" Value="180" Margin="0,5"/>
-                <TextBlock x:Name="AngleValue" Text="180" Foreground="#666" FontSize="10"/>
+                <TextBlock Text="Tolerance Angle (degrees):" Foreground="#333" FontSize="10"/>
+                <Slider x:Name="AngleSlider" Minimum="0" Maximum="360" Value="0" Margin="0,3"/>
+                <TextBlock x:Name="AngleValue" Text="0" Foreground="#666" FontSize="9"/>
             </StackPanel>
 
             <StackPanel Margin="10">
-                <TextBlock Text="Max Overlap:" Foreground="#333" FontSize="11"/>
-                <Slider x:Name="OverlapSlider" Minimum="0.0" Maximum="1.0" Value="0.8" Margin="0,5"/>
-                <TextBlock x:Name="OverlapValue" Text="0.8" Foreground="#666" FontSize="10"/>
+                <TextBlock Text="Max Overlap:" Foreground="#333" FontSize="10"/>
+                <Slider x:Name="OverlapSlider" Minimum="0.0" Maximum="1.0" Value="0.8" Margin="0,3"/>
+                <TextBlock x:Name="OverlapValue" Text="0.8" Foreground="#666" FontSize="9"/>
             </StackPanel>
 
-            <Separator Background="#EEEEEE" Margin="0,15"/>
+            <Separator Background="#EEEEEE" Margin="0,10"/>
 
             <!-- Action Buttons -->
             <Button Content="MATCH" Click="MatchButton_Click" 
-                    Background="#4CAF50" Foreground="White" FontWeight="Bold" FontSize="12"
-                    Padding="10,12" Margin="10" Cursor="Hand"/>
+                    Background="#4CAF50" Foreground="White" FontWeight="Bold" FontSize="11"
+                    Padding="10,10" Margin="10,5" Cursor="Hand"/>
+            <Button Content="Save Result" Click="SaveButton_Click" 
+                    Background="#2196F3" Foreground="White" FontSize="10"
+                    Padding="10,8" Margin="10,2" Cursor="Hand"/>
             <Button Content="Clear" Click="ClearButton_Click" 
-                    Background="#757575" Foreground="White" FontSize="11"
-                    Padding="10,10" Margin="10,5"/>
+                    Background="#757575" Foreground="White" FontSize="10"
+                    Padding="10,8" Margin="10,2" Cursor="Hand"/>
 
-            <Separator Background="#EEEEEE" Margin="0,15"/>
+            <Separator Background="#EEEEEE" Margin="0,10"/>
 
             <!-- Results Section -->
-            <TextBlock Text="Results" FontSize="12" FontWeight="Bold" Margin="10,15,10,5"/>
-            <ListBox x:Name="ResultsList" Height="250" Margin="10" Background="#FAFAFA" BorderBrush="#EEEEEE"/>
+            <TextBlock Text="Matches Found" FontSize="11" FontWeight="Bold" Margin="10,10,10,5"/>
+            <ListBox x:Name="ResultsList" Height="280" Margin="10" Background="#FAFAFA" BorderBrush="#EEEEEE" FontSize="9"/>
 
             <!-- Status Bar -->
-            <TextBlock x:Name="StatusText" Text="Ready" Foreground="#666" FontSize="10" 
-                       Margin="10,10,10,5" TextWrapping="Wrap"/>
+            <TextBlock x:Name="StatusText" Text="Ready" Foreground="#666" FontSize="9" 
+                       Margin="10,10,10,5" TextWrapping="Wrap" Height="40"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 using FastestImageMatching.Core;
 using FastestImageMatching.Models;
 
@@ -16,7 +17,9 @@ namespace FastestImageMatching.UI
     {
         private Mat? sourceImageMat;
         private Mat? templateImageMat;
+        private Mat? resultImageMat;
         private PatternMatcher matcher;
+        private List<MatchResult> lastResults;
 
         /// <summary>
         /// Initialize the main window
@@ -25,6 +28,7 @@ namespace FastestImageMatching.UI
         {
             InitializeComponent();
             matcher = new PatternMatcher();
+            lastResults = new List<MatchResult>();
             SetupEventHandlers();
         }
 
@@ -75,9 +79,12 @@ namespace FastestImageMatching.UI
                     results = matcher.Match(sourceImageMat, config);
                 }
 
-                // Display results
+                // Save results
+                lastResults = results;
+
+                // Draw results on image
                 DisplayResults(results);
-                StatusText.Text = $"Found {results.Count} matches";
+                StatusText.Text = $"Found {results.Count} matches in {(config.ToleranceAngle > 0 ? "rotation search" : "fixed orientation")}";
             }
             catch (Exception ex)
             {
@@ -89,28 +96,82 @@ namespace FastestImageMatching.UI
         {
             SourceImage.Source = null;
             TemplateImage.Source = null;
+            ResultImage.Source = null;
             ResultsList.Items.Clear();
             StatusText.Text = "Cleared";
             
             sourceImageMat?.Dispose();
             templateImageMat?.Dispose();
+            resultImageMat?.Dispose();
             sourceImageMat = null;
             templateImageMat = null;
+            resultImageMat = null;
+            lastResults.Clear();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (resultImageMat == null || resultImageMat.Empty())
+            {
+                StatusText.Text = "No result image to save. Run matching first.";
+                return;
+            }
+
+            try
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog
+                {
+                    Filter = "PNG Image (*.png)|*.png|JPEG Image (*.jpg)|*.jpg|BMP Image (*.bmp)|*.bmp",
+                    DefaultExt = ".png",
+                    FileName = "match_result.png"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    Cv2.ImWrite(saveDialog.FileName, resultImageMat);
+                    StatusText.Text = $"Result saved to: {saveDialog.FileName}";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Error saving result: {ex.Message}";
+            }
         }
 
         private void DisplayResults(List<MatchResult> results)
         {
             ResultsList.Items.Clear();
-            foreach (var result in results)
+
+            // Draw results on image
+            if (sourceImageMat != null)
             {
-                ResultsList.Items.Add(new ResultItem
+                resultImageMat?.Dispose();
+                resultImageMat = ResultVisualizer.DrawMatches(sourceImageMat, results, templateImageMat);
+
+                // Convert and display
+                try
                 {
-                    Index = ResultsList.Items.Count,
-                    Score = result.Score,
-                    Angle = result.Angle,
-                    PosX = result.Location.X,
-                    PosY = result.Location.Y
-                });
+                    Mat displayMat = new Mat();
+                    Cv2.Resize(resultImageMat, displayMat, new OpenCvSharp.Size(600, 400));
+                    ResultImage.Source = BitmapConverter.ToBitmap(displayMat);
+                    displayMat.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    StatusText.Text = $"Error displaying result: {ex.Message}";
+                }
+            }
+
+            // Display results in list
+            for (int i = 0; i < results.Count; i++)
+            {
+                var result = results[i];
+                string text = $"Match #{i}: Score={result.Score:F4} | Pos=({result.Location.X:F0},{result.Location.Y:F0})";
+                if (Math.Abs(result.Angle) > 0.1)
+                {
+                    text += $" | Angle={result.Angle:F1}°";
+                }
+                ResultsList.Items.Add(text);
             }
         }
 
@@ -146,7 +207,7 @@ namespace FastestImageMatching.UI
                 {
                     sourceImageMat = image.Clone();
                     Mat display = new Mat();
-                    Cv2.Resize(sourceImageMat, display, new OpenCvSharp.Size(400, 350));
+                    Cv2.Resize(sourceImageMat, display, new OpenCvSharp.Size(350, 280));
                     SourceImage.Source = BitmapConverter.ToBitmap(display);
                     display?.Dispose();
                     StatusText.Text = "Source image loaded";
@@ -155,7 +216,7 @@ namespace FastestImageMatching.UI
                 {
                     templateImageMat = image.Clone();
                     Mat display = new Mat();
-                    Cv2.Resize(templateImageMat, display, new OpenCvSharp.Size(400, 350));
+                    Cv2.Resize(templateImageMat, display, new OpenCvSharp.Size(300, 250));
                     TemplateImage.Source = BitmapConverter.ToBitmap(display);
                     display?.Dispose();
                     StatusText.Text = "Template image loaded";
@@ -166,18 +227,6 @@ namespace FastestImageMatching.UI
             {
                 StatusText.Text = $"Error loading image: {ex.Message}";
             }
-        }
-
-        private class ResultItem
-        {
-            public int Index { get; set; }
-            public double Score { get; set; }
-            public double Angle { get; set; }
-            public double PosX { get; set; }
-            public double PosY { get; set; }
-
-            public override string ToString() => 
-                $"#{Index}: Score={Score:F4} Angle={Angle:F1}° Pos=({PosX:F0},{PosY:F0})";
         }
     }
 }
