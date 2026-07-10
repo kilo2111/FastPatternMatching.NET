@@ -48,18 +48,20 @@ namespace FastestImageMatching.Core
 
             Mat current = floatImage.Clone();
             int level = 0;
+            int currentRows = current.Rows;
+            int currentCols = current.Cols;
 
             // Build coarser levels until minimum area reached
-            while (current.Rows * current.Cols > minReducedArea && level < 20)
+            while (currentRows * currentCols > minReducedArea && level < 20)
             {
-                int newWidth = (int)(current.Cols / scaleRatio);
-                int newHeight = (int)(current.Rows / scaleRatio);
+                int newWidth = (int)(currentCols / scaleRatio);
+                int newHeight = (int)(currentRows / scaleRatio);
 
                 // Ensure at least 1x1
                 newWidth = Math.Max(1, newWidth);
                 newHeight = Math.Max(1, newHeight);
 
-                if (newWidth >= current.Cols && newHeight >= current.Rows)
+                if (newWidth >= currentCols && newHeight >= currentRows)
                     break; // No more scaling needed
 
                 Mat downsampled = new Mat();
@@ -80,6 +82,8 @@ namespace FastestImageMatching.Core
                 if (pyramid.Count > 0)
                 {
                     current = pyramid[pyramid.Count - 1].Clone();
+                    currentRows = current.Rows;
+                    currentCols = current.Cols;
                 }
                 level++;
             }

@@ -26,7 +26,7 @@ namespace FastestImageMatching.Core
         /// <summary>
         /// Draw match results on image
         /// </summary>
-        public static Mat DrawMatches(Mat sourceImage, List<MatchResult> results, Mat template)
+        public static Mat DrawMatches(Mat sourceImage, List<MatchResult>? results, Mat? template)
         {
             if (sourceImage == null || sourceImage.Empty())
                 return sourceImage.Clone();
@@ -58,7 +58,7 @@ namespace FastestImageMatching.Core
                     }
 
                     // Get text size for background
-                    Cv2.GetTextSize(text, HersheyFonts.HersheySimplexSmall, 0.5, 1, out Size textSize);
+                    Cv2.GetTextSize(text, HersheyFonts.HersheyPlain, 1.0, 1, out Size textSize);
 
                     // Draw text background
                     int x = result.BoundingBox.X;
@@ -71,7 +71,7 @@ namespace FastestImageMatching.Core
                     // Draw text
                     Cv2.PutText(output, text,
                         new Point(x, y - 2),
-                        HersheyFonts.HersheySimplexSmall, 0.5,
+                        HersheyFonts.HersheyPlain, 1.0,
                         new Scalar(255, 255, 255), 1);
                 }
                 catch (Exception ex)

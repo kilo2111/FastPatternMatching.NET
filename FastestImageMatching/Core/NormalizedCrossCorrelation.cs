@@ -49,7 +49,12 @@ namespace FastestImageMatching.Core
         /// </summary>
         public static Mat ComputeNCCMap(Mat source, Mat template)
         {
-            Mat result = new Mat(source.Rows - template.Rows + 1, source.Cols - template.Cols + 1, MatType.CV_64F);
+            int sourceRows = source.Rows;
+            int sourceCols = source.Cols;
+            int templateRows = template.Rows;
+            int templateCols = template.Cols;
+
+            Mat result = new Mat(sourceRows - templateRows + 1, sourceCols - templateCols + 1, MatType.CV_64F);
 
             for (int y = 0; y < result.Rows; y++)
             {
